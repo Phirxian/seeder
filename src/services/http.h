@@ -5,6 +5,8 @@
 
 namespace network
 {
+    class ConnectedClient;
+    
     namespace service
     {
         inline void replace(std::string &source, const std::string &last, const std::string &by) noexcept
@@ -53,20 +55,20 @@ namespace network
             }
         };
         
-        class HttpListener : public network::SeederListener
+        class HttpListener : public SeederListener
         {
             public:
                 HttpListener() : breakLoop(false) { }
 
-                virtual void recvData(const std::string &msg);
-                virtual void recvData(network::option::Client *c, const std::string &msg);
+                virtual void recvData(const ReceivedMessage &msg);
 
-                virtual void notifySendError(const std::string &msg, int error, int flags, const network::option::Client *c = 0);
+                virtual void notifySendError(const SendingMessage &msg, int error);
+                virtual void notifySendError(const UnconnectedMessage&, int error) {}
 
-                virtual void notifyPeerLost(network::option::Client*, int index);
-                virtual void notifyPeerCrashed(network::option::Client*, int index);
-                virtual void notifyPeerConnected(network::option::Client*, int index);
-                virtual void notifyPeerDisconnected(network::option::Client*, int index);
+                virtual void notifyPeerLost(ConnectedClient*, int index);
+                virtual void notifyPeerCrashed(ConnectedClient*, int index);
+                virtual void notifyPeerConnected(ConnectedClient*, int index);
+                virtual void notifyPeerDisconnected(ConnectedClient*, int index);
 
                 virtual void notifyConnected(bool);
                 virtual void notifyConnectionLost();

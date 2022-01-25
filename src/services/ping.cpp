@@ -12,7 +12,7 @@
 #   include <linux/icmp.h>
 #endif
 
-#include "Seeder.h"
+#include "SeederClient.h"
 
 namespace network
 {
@@ -39,6 +39,7 @@ namespace network
             answer = ~sum;
             return answer;
         }
+        
         int ping(const std::string &ip, int timeout) noexcept
         {
             std::string request;
@@ -65,20 +66,25 @@ namespace network
             icmp->un.echo.icmp_id = getpid() & 0xFFFF;
             icmp->un.echo.icmp_seq = htons(1);
             icmp->icmp_cksum = in_cksum((unsigned short*)ipheader,sizeof(IPHeader)+sizeof(ICMPHeader));
-
-            Seeder *se = new Seeder();
-            se->init(option::SAM_CLIENT, option::STM_RAW, 0, timeout, option::SPM_ICMP);
+            
+            SocketInfo info(option::STM_RAW, 0, timeout, option::SPM_ICMP);
+            SeederClient *se = new SeederClient();
+            se->init(info);
             se->setMTU(request.size());
-            se->end();
 
             int hold = 1;
             setsockopt(se->getSocket(), SOL_SOCKET, SO_DEBUG, (char *)&hold, sizeof(hold));
             setsockopt(se->getSocket(), IPPROTO_IP, IP_HDRINCL, &hold, sizeof(hold));
             setsockopt(se->getSocket(), SOL_SOCKET, SO_BROADCAST, (char *)&hold, sizeof(hold));
 
-            se->sendMsgTo(request, ip.c_str(), 0);
+            UnconnectedMessage msg(request);
+            msg.ip = ip.c_str();
+            msg.port = 0;
+            se->sendDataTo(msg);
+            
             int start = clock();
-            request = se->waitRecvDataFrom(ip.c_str(), 0);
+            msg = se->waitRecvDataFrom(ip.c_str(), 0);
+            request = msg.to_string();
             int end = clock();
 
             ipheader = (IPHeader*)(request.c_str());

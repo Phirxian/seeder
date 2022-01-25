@@ -44,3 +44,11 @@ include_directories("src/")
 
 file(GLOB_RECURSE SRC src/*.cpp src/*.c src/*.h)
 add_library(seeder STATIC ${SRC})
+
+add_executable(chat-client examples/chat-client.cpp)
+add_executable(chat-server examples/chat-server.cpp)
+add_executable(test-http examples/test-http.cpp)
+
+target_link_libraries(chat-client -lstdc++fs -lpthread -lcurl -lncurses seeder)
+target_link_libraries(chat-server -lstdc++fs -lpthread -lcurl seeder)
+target_link_libraries(test-http -lstdc++fs -lpthread -lcurl seeder)

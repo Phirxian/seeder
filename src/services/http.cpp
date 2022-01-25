@@ -1,5 +1,5 @@
 #include "http.h"
-#include "Seeder.h"
+#include "SeederClient.h"
 #include <iostream>
 
 namespace network
@@ -9,12 +9,11 @@ namespace network
         std::string getRemoteFile(const std::string &url, const std::string &file, int timeout) noexcept
         {
             std::string data;
-            Seeder *se = new Seeder();
-
             HttpListener tmp;
-            se->setListener(&tmp);
-
-            se->init(option::SAM_CLIENT, option::STM_TCP, option::SPT_HTTP, timeout);
+            
+            SocketInfo info(option::STM_TCP, option::SPT_HTTP, timeout);
+            SeederClient *se = new SeederClient(&tmp);
+            se->init(info);
             se->connectTo(url);
 
             if(!se->isConnected())
@@ -28,13 +27,12 @@ namespace network
                 request += " HTTP/1.0\r\nHost: ";
                 request += url;
                 request += "\r\nUser-Agent: HTMLGET 1.0\r\n\r\n";
-            se->sendMsg(request);
+                
+            SendingMessage msg(request.c_str(), request.size());
+            se->sendData(msg);
 
             while(se->isConnected() && !tmp.breakLoop)
-            {
                 se->run();
-                se->end();
-            }
 
             delete se;
             return tmp.data;
@@ -54,24 +52,24 @@ namespace network
         
         // *******************************************************
         
-        void HttpListener::notifySendError(const std::string &msg, int error, int flags, const network::option::Client *c)
+        void HttpListener::notifySendError(const SendingMessage &msg, int error)
         {
-            std::cout << msg << std::endl;
-            breakLoop |= !msg.empty();
+            std::cout << msg.to_string() << std::endl;
+            breakLoop |= (msg.length == 0);
         }
-        void HttpListener::notifyPeerLost(network::option::Client*, int index)
-        {
-            breakLoop = true;
-        }
-        void HttpListener::notifyPeerCrashed(network::option::Client*, int index)
+        void HttpListener::notifyPeerLost(ConnectedClient*, int index)
         {
             breakLoop = true;
         }
-        void HttpListener::notifyPeerConnected(network::option::Client*, int index)
+        void HttpListener::notifyPeerCrashed(ConnectedClient*, int index)
         {
             breakLoop = true;
         }
-        void HttpListener::notifyPeerDisconnected(network::option::Client*, int index)
+        void HttpListener::notifyPeerConnected(ConnectedClient*, int index)
+        {
+            breakLoop = true;
+        }
+        void HttpListener::notifyPeerDisconnected(ConnectedClient*, int index)
         {
             breakLoop = true;
         }
@@ -83,13 +81,9 @@ namespace network
         {
             breakLoop = true;
         }
-        void HttpListener::recvData(const std::string &msg)
+        void HttpListener::recvData(const ReceivedMessage &msg)
         {
-            data += msg;
-        }
-        void HttpListener::recvData(network::option::Client *c, const std::string &msg)
-        {
-            data += msg;
+            data += msg.to_string();
         }
     }
 }

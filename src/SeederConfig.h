@@ -5,19 +5,17 @@
 
 namespace network
 {
+    class ConnectedClient;
+    
     namespace option
-    {
-        enum S_APPLICATION_MODE
-        {
-            SAM_SERVEUR,                     /* Serviver side interface selection */
-            SAM_CLIENT                       /* Client side interface selection */
-        };
+    {   
         enum S_TRANSFAIRE_MODE
         {
             STM_TCP = SOCK_STREAM,           /* Sequenced, reliable, connection-based byte streams. */
             STM_UDP = SOCK_DGRAM,            /* Connectionless, unreliable datagrams of fixed maximum length. */
             STM_RAW = SOCK_RAW,              /* Raw protocol interface. */
         };
+        
         enum S_PROTOCOL_MODE
         {
             SPM_AUTO = -1,                   /* automatic detecte protocol from S_TRANSFAIRE_MODE */
@@ -39,84 +37,51 @@ namespace network
             SPM_DSTOPTS = IPPROTO_DSTOPTS,   /* IPv6 destination options.  */
             SPM_RAW = IPPROTO_RAW,	         /* Raw IP packets.  */
             #ifndef __WIN32
-            SPM_IPIP = IPPROTO_IPIP,	       /* IPIP tunnels (older KA9Q tunnels use 94).  */
-            SPM_EGP = IPPROTO_EGP,	         /* Exterior Gateway Protocol.  */
-            SPM_TP = IPPROTO_TP,	           /* SO Transport Protocol Class 4.  */
-            SPM_DCCP = IPPROTO_DCCP,	       /* Datagram Congestion Control Protocol.  */
-            SPM_RSVP = IPPROTO_RSVP,	       /* Reservation Protocol.  */
-            SPM_UDPLITE = IPPROTO_UDPLITE,   /* UDP-Lite protocol.  */
-            SPM_GRE = IPPROTO_GRE,	         /* General Routing Encapsulation.  */
-            SPM_MTP = IPPROTO_MTP,	         /* Multicast Transport Protocol.  */
-            SPM_ENCAP = IPPROTO_ENCAP,	     /* Encapsulation Header.  */
-            SPM_PIM = IPPROTO_PIM,	         /* Protocol Independent Multicast.  */
-            SPM_COMP = IPPROTO_COMP,	       /* Compression Header Protocol.  */
-            SPM_SCTP = IPPROTO_SCTP,	       /* Stream Control Transmission Protocol.  */
+                SPM_IPIP = IPPROTO_IPIP,	       /* IPIP tunnels (older KA9Q tunnels use 94).  */
+                SPM_EGP = IPPROTO_EGP,	         /* Exterior Gateway Protocol.  */
+                SPM_TP = IPPROTO_TP,	           /* SO Transport Protocol Class 4.  */
+                SPM_DCCP = IPPROTO_DCCP,	       /* Datagram Congestion Control Protocol.  */
+                SPM_RSVP = IPPROTO_RSVP,	       /* Reservation Protocol.  */
+                SPM_UDPLITE = IPPROTO_UDPLITE,   /* UDP-Lite protocol.  */
+                SPM_GRE = IPPROTO_GRE,	         /* General Routing Encapsulation.  */
+                SPM_MTP = IPPROTO_MTP,	         /* Multicast Transport Protocol.  */
+                SPM_ENCAP = IPPROTO_ENCAP,	     /* Encapsulation Header.  */
+                SPM_PIM = IPPROTO_PIM,	         /* Protocol Independent Multicast.  */
+                SPM_COMP = IPPROTO_COMP,	       /* Compression Header Protocol.  */
+                SPM_SCTP = IPPROTO_SCTP,	       /* Stream Control Transmission Protocol.  */
             #endif
-        };
-
-        struct Client
-        {
-            Client() : sock(0), ip("0.0.0.0"), mac("00:00:00:00:00:00:00:00"), user(0) { }
-            ~Client() { }
-
-            SEEDER_SOCKET sock;
-            const char *ip;
-            const char *mac;
-
-            void *user;
-        };
-        
-        struct SocketInfo
-        {
-            SocketInfo() : TYPE(SPM_AUTO), APP(SAM_SERVEUR), MODE(STM_TCP),
-                           autoriseAccept(false), ipConnect("0.0.0.0"),
-                           PORT(0), error(0), octRecv(0), recvSockId(0), recvSock(0)
-            {
-            }
-            ~SocketInfo() { }
-
-            S_PROTOCOL_MODE   TYPE;         /* standar protocol type using, internal used form reconnectTo and other Seeder core**/
-            S_APPLICATION_MODE APP;         /* internal used form reconnectTo and other Seeder core */
-            S_TRANSFAIRE_MODE MODE;         /* internal used form reconnectTo and other Seeder core */
-            bool autoriseAccept;            /* if you have activate Accept with activeAccept(bool acpt), value is thas */
-            std::string ipConnect;          /* you have used connecTo ? ip of last connect is thas */
-            int PORT;                       /* Port of you have connected */
-            int error;                      /* if seeder producte error, return in this, used from all recv/send/co... return sendMsg size ... */
-            int octRecv;                    /* recvMsg size of message -1 if SOCKET_ERROR */
-            int recvSockId;                 /* peer emitter index */
-            Client *recvSock;               /* peer emitter pointor */
         };
         
         enum S_PORT_TYPE
         {
             /** list of special service/application port used */
             /************ SERVICE ***********/
-            SPT_ECHO = 7,		    /* Echo service.  */
+            SPT_ECHO = 7,		      /* Echo service.  */
             SPT_DISCARD = 9,	    /* Discard transmissions service.  */
-            SPT_SYSTAT = 11,        /* System status service.  */
+            SPT_SYSTAT = 11,      /* System status service.  */
             SPT_DAYTIME = 13,	    /* Time of day service.  */
             SPT_NETSTAT = 15,	    /* Network status service. */
-            SPT_TIMESERVER = 37,    /* Timeserver service.  */
-            SPT_NAMESERVER = 42,    /* Domain Name Service.  */
+            SPT_TIMESERVER = 37,  /* Timeserver service.  */
+            SPT_NAMESERVER = 42,  /* Domain Name Service.  */
             SPT_MTP = 57,
             SPT_SUPDUP = 95,	    /* SUPDUP protocol.  */
             SPT_EXECSERVER = 512,	/* execd service.  */
-            SPT_LOGINSERVER = 513,	/* rlogind service.  */
+            SPT_LOGINSERVER = 513,/* rlogind service.  */
             SPT_CMDSERVER = 514,
             SPT_EFSSERVER = 520,
             SPT_BIFFUDP = 512,
             SPT_WHOSERVER = 513,
             SPT_ROUTESERVER = 520,
             /************ SERVEUR ***********/
-            SPT_FTP = 21,           /* File Transfer Protocol.  */
-            SPT_TELNET = 23,        /* Telnet protocol.  */
-            SPT_SMTP = 25,          /* Simple Mail Transfer Protocol.  */
+            SPT_FTP = 21,         /* File Transfer Protocol.  */
+            SPT_TELNET = 23,      /* Telnet protocol.  */
+            SPT_SMTP = 25,        /* Simple Mail Transfer Protocol.  */
             SPT_DNS = 53,
-            SPT_WHOIS = 63,         /* gamet Whois service.  */
-            SPT_TFTP = 69,          /* Trivial File Transfer Protocol.  */
+            SPT_WHOIS = 63,       /* gamet Whois service.  */
+            SPT_TFTP = 69,        /* Trivial File Transfer Protocol.  */
             SPT_GOPHER = 70,
             SPT_RJE = 77,
-            SPT_FINGER = 79,        /* Finger service.  */
+            SPT_FINGER = 79,      /* Finger service.  */
             SPT_NNTP = 119,
             SPT_LOTUS = 1352,
             SPT_RPS = 799,
