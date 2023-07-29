@@ -54,7 +54,7 @@ namespace network
         sync->sin.sin_family = AF_INET;
         sync->sin.sin_port = htons(sem.port);
 
-        if(bind(sock, reinterpret_cast<sockaddr *>(&sync->sin), recsize) < 0)
+        if(bind(sock, reinterpret_cast<sockaddr *>(&sync->sin), recv_size) < 0)
         {
             std::cout << "Seeder error on bind:" << std::endl;
             std::cout << strerror(errno) << std::endl;
@@ -155,14 +155,14 @@ namespace network
     
     ConnectedClient* SeederServer::acceptClient() noexcept
     {
-        if(!autoriseAccept)
+        if(!authoriseAccept)
             return nullptr;
             
         ConnectedClient *client = new ConnectedClient();
         #if defined LINUX
-            if((client->sock = accept (sock, (SOCKADDR *) &sync->sin,(socklen_t*)&recsize)) <= 1) // == INVALID_SOCKET
+            if((client->sock = accept (sock, (SOCKADDR *) &sync->sin,(socklen_t*)&recv_size)) <= 1) // == INVALID_SOCKET
         #else
-            if((client->sock = (SOCKET)accept(sock, (SOCKADDR *) &sync->sin,(int*)&recsize)) <= 1) // == INVALID_SOCKET
+            if((client->sock = (SOCKET)accept(sock, (SOCKADDR *) &sync->sin,(int*)&recv_size)) <= 1) // == INVALID_SOCKET
         #endif
         {
             if(listener)

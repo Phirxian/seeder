@@ -30,7 +30,7 @@ namespace network
         int length;
         //! peer emitter index
         unsigned int recvSockId;
-        //! peer emitter pointor
+        //! peer emitter pointer
         ConnectedClient *recvSock;
     };
     

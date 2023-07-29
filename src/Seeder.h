@@ -95,7 +95,7 @@ namespace network
             void setupTimeout(const int ms) noexcept;
             
             SEEDER_SOCKET sock;
-            unsigned int  recsize;
+            unsigned int  recv_size;
             unsigned int  mtu;
             bool          IsConnected;
 

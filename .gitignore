@@ -1,6 +1,8 @@
 bin/*
 build/*
+doc/*
 
+.vscode
 # Prerequisites
 *.d
 

@@ -1,5 +1,6 @@
 #include "NetworkAPI.h"
 #include "ping.h"
+#include <ctime>
 
 #ifndef __linux
 #   include <winsock2.h>

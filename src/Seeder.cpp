@@ -54,7 +54,7 @@ namespace network
 
     void Seeder::setupTimeout(const int ms) noexcept
     {
-        recsize = (int)sizeof(sync->sin);
+        recv_size = (int)sizeof(sync->sin);
         sync->timeout.tv_sec = 0;
         sync->timeout.tv_usec = ms*1000;
         setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&sync->timeout, sizeof(sync->timeout));

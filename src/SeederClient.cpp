@@ -52,6 +52,7 @@ namespace network
 
         return errno;
     }
+
     int SeederClient::connectLocalHost() noexcept
     {
         ipConnect = "localhost";
@@ -73,6 +74,7 @@ namespace network
         
         return errno;
     }
+
     int SeederClient::connectTo(const std::string &ip) noexcept
     {
         ipConnect = ip;
@@ -131,6 +133,7 @@ namespace network
             listener->notifyConnected(IsConnected);
         return error == 0 ? true : false;
     }
+    
     int SeederClient::reConnectTo(const std::string &ip, const unsigned int retry) noexcept
     {
         shutdown();

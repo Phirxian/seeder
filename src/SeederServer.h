@@ -17,7 +17,7 @@ namespace network
             int init(const SocketInfo &info) noexcept;
             
             //! allow peer to connect here
-            virtual void activeAccept(const bool acpt) noexcept { autoriseAccept = acpt; };
+            virtual void activeAccept(const bool acpt) noexcept { authoriseAccept = acpt; };
             //! wait new client
             virtual ConnectedClient* acceptClient() noexcept;
             
@@ -38,12 +38,12 @@ namespace network
             virtual int sendDataTo(const SendingMessage&, const unsigned int n_clt) noexcept;
             //! send data to specified connected peer
             virtual int sendDataTo(const SendingMessage&, const ConnectedClient *clt) noexcept;
-            //! send data to all peer exepted it
+            //! send data to all peer excepted it
             virtual int sendDataExcepted(const SendingMessage&, const unsigned n_clt) noexcept;
-            //! send data to all peer exepted it
+            //! send data to all peer excepted it
             virtual int sendDataExcepted(const SendingMessage&, const ConnectedClient *clt) noexcept;
 
-            //! asynchrone waiting data from all peer
+            //! asynchronous waiting data from all peer
             virtual void run() noexcept;
             
         protected:
@@ -52,7 +52,7 @@ namespace network
             
         protected:
             //! allow new clients
-            bool autoriseAccept;
+            bool authoriseAccept;
             //! list of connected clients
             ClientArray peer;
     };
